@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Medication card · Dawa Tech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--p:#0B7A75;--ink:#14211F;--mute:#5E7774;--line:#E1ECEA;--bg:#F4F7F6;--card:#fff;--bad:#B4232F;--badbg:#FCEBEC;--warn:#9A5B00;--warnbg:#FFF4DF;--ok:#167A4A;--okbg:#E4F4EB}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Tajawal,system-ui,sans-serif;font-size:16px;-webkit-text-size-adjust:100%}
+[dir=rtl] body,[dir=rtl] .wrap{font-family:Tajawal,Inter,system-ui,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 40px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.who{font-size:22px;font-weight:700;line-height:1.2}
+.ids{color:var(--mute);font-size:15px;margin-top:2px}
+.tools{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.lang{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font:inherit;font-size:14px;color:var(--p);font-weight:600;cursor:pointer}
+.timer{font-size:12.5px;color:var(--mute);white-space:nowrap}
+section{margin-top:16px}
+h2{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 8px;font-weight:700}
+[dir=rtl] h2{letter-spacing:0;font-size:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.allergy{background:var(--badbg);border:1px solid #F3C6CA;border-radius:14px;padding:12px 14px}
+.allergy b{color:var(--bad)}
+.tag{display:inline-block;background:#fff;color:var(--bad);border-radius:99px;padding:3px 10px;margin:4px 4px 0 0;font-weight:600;font-size:14.5px}
+.none{color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.flag{display:flex;gap:10px;padding:11px 14px;border-top:1px solid var(--line);line-height:1.45}
+.flag:first-child{border-top:0}
+.flag .dot{flex:0 0 8px;height:8px;border-radius:50%;margin-top:8px;background:var(--warn)}
+.flag.high{background:var(--badbg)}
+.flag.high .dot{background:var(--bad)}
+.flag.high span{color:var(--bad);font-weight:600}
+.med{display:grid;grid-template-columns:52px 1fr auto;gap:12px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.med:first-child{border-top:0}
+.ph{width:52px;height:52px;border-radius:10px;object-fit:cover;background:#E9F1F0;display:block;cursor:zoom-in}
+.ph.empty{display:grid;place-items:center;color:#9BB5B2;font-size:20px;cursor:default}
+.gen{font-weight:700;font-size:16.5px}
+.brand{color:var(--mute);font-weight:500}
+.sig{margin-top:2px;font-size:15px}
+.meta{margin-top:3px;font-size:13px;color:var(--mute)}
+.adh{text-align:end;min-width:64px}
+.adh .n{font-weight:700;font-size:16px}
+.adh .l{font-size:11.5px;color:var(--mute)}
+.adh.good .n{color:var(--ok)} .adh.mid .n{color:var(--warn)} .adh.low .n{color:var(--bad)}
+.miss{display:inline-block;margin-top:5px;background:var(--warnbg);color:var(--warn);border-radius:6px;padding:2px 8px;font-size:12.5px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .ph{width:38px;height:38px}
+.left{font-weight:700;color:var(--p);white-space:nowrap}
+.foot{margin-top:22px;font-size:12.5px;color:var(--mute);line-height:1.6;text-align:center}
+.state{margin:18vh auto 0;text-align:center;max-width:360px;line-height:1.6}
+.state .big{font-size:20px;font-weight:700;margin-bottom:6px}
+.zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:20;padding:16px}
+.zoom img{max-width:100%;max-height:90vh;border-radius:12px}
+.ltr{direction:ltr;unicode-bidi:isolate}
+@media print{header{position:static}.lang,.timer{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="state"><div class="big">…</div></div></div>
+<div class="zoom" id="zoom" onclick="this.style.display='none'"><img alt=""></div>
+<script>
+const SB = supabase.createClient('https://hwwhtfdrajnfvollgyox.supabase.co', 'sb_publishable_ZO5sTdGcCi8i4FR9sLj7Pg_uBVqOe-2',
+  {auth:{persistSession:false}});
+const code = new URLSearchParams(location.search).get('d') || '';
+let lang = (()=>{try{return localStorage.getItem('dt_doc_lang')}catch(e){return null}})() || 'en';
+let data = null;
+
+const T = {
+  en:{allergies:'Allergies',noAllergy:'No allergies recorded',flags:'Alerts',active:'Active medications',none:'No active medications',
+      stopped:'Stopped · last 3 months',fridge:'Leftover at home',left:'left',adh:'adherence 30d',newMed:'new',since:'since',until:'until',
+      expired:'This link has expired',expiredSub:'Ask the caregiver to open the doctor card again for a new code.',
+      bad:'Invalid link',valid:'valid',min:'min',foot:'Entered by the caregiver in Dawa Tech — not an official medical record. Adherence is based on dose confirmations on the patient\'s phone.',
+      child:'child',expiry:'box exp.',lang:'عربي',title:'Medication card'},
+  ar:{allergies:'الحساسية',noAllergy:'لا توجد حساسية مسجلة',flags:'تنبيهات',active:'الأدوية الحالية',none:'لا أدوية حالية',
+      stopped:'أُوقفت · آخر 3 أشهر',fridge:'متبقٍّ في البيت (ثلاجة الدواء)',left:'متبقٍّ',adh:'الالتزام 30 يومًا',newMed:'جديد',since:'منذ',until:'حتى',
+      expired:'انتهت صلاحية الرابط',expiredSub:'اطلب من المرافق فتح بطاقة الطبيب مرة أخرى لرمز جديد.',
+      bad:'رابط غير صحيح',valid:'صالحة',min:'د',foot:'بيانات أدخلها المرافق في دواء تك، وليست سجلًا طبيًا رسميًا. الالتزام محسوب من تأكيدات جوال المريض.',
+      child:'طفل',expiry:'صلاحية العلبة',lang:'English',title:'بطاقة الأدوية'}
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const t = k => T[lang][k];
+
+function photo(url, cls=''){
+  return url ? `<img class="ph ${cls}" src="${esc(url)}" alt="" loading="lazy" onclick="zoom(this.src)" onerror="this.outerHTML='<div class=&quot;ph empty&quot;>▢</div>'">`
+             : `<div class="ph empty ${cls}">▢</div>`;
+}
+function zoom(src){const z=document.getElementById('zoom');z.querySelector('img').src=src;z.style.display='grid'}
+function fmtDate(s){
+  if(!s) return '';
+  const d = new Date(s+'T00:00:00');
+  return d.toLocaleDateString(lang==='ar'?'ar-SA-u-ca-gregory':'en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+function timeFmt(hm){
+  const [h,m] = hm.split(':').map(Number);
+  if (lang==='en') return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  const h12 = h%12===0?12:h%12; return `${h12}:${String(m).padStart(2,'0')} ${h<12?'ص':'م'}`;
+}
+
+function render(){
+  document.documentElement.lang = lang; document.documentElement.dir = lang==='ar'?'rtl':'ltr';
+  document.title = `${t('title')} · ${data.name}`;
+  const ids = [
+    data.sex ? (lang==='ar' ? (data.sex==='m'?'ذكر':'أنثى') : (data.sex==='m'?'Male':'Female')) : null,
+    data.age!=null ? (lang==='ar' ? `${data.age} سنة` : `${data.age} y`) : (data.kid ? t('child') : null),
+    data.weight!=null ? `${data.weight} ${lang==='ar'?'كجم':'kg'}` : null,
+  ].filter(Boolean).join(' · ');
+
+  const al = data.allergies.length
+    ? `<div class="allergy"><b>⚠ ${t('allergies')}</b><div>${data.allergies.map(a=>`<span class="tag">${esc(a)}</span>`).join('')}</div></div>`
+    : `<div class="none">${t('noAllergy')}</div>`;
+
+  const flags = data.flags.length ? `<section><h2>${t('flags')}</h2><div class="box">${
+    data.flags.map(f=>`<div class="flag ${f.high?'high':''}"><div class="dot"></div><span>${esc(lang==='ar'?f.ar:f.en)}</span></div>`).join('')
+  }</div></section>` : '';
+
+  const meds = data.active.length ? data.active.map(m=>{
+    const a = m.adherence;
+    const cls = a==null ? '' : a>=80 ? 'good' : a>=60 ? 'mid' : 'low';
+    const gen = lang==='ar' && m.generic_ar ? m.generic_ar : m.generic;
+    const brand = m.brand && m.brand!==m.generic ? ` <bdi class="brand">(${esc(m.brand)})</bdi>` : '';
+    const sig = lang==='ar'
+      ? `${esc(m.dose_ar)} · ${esc(m.freq_ar)}${m.food_ar && m.food_ar!=='غير مرتبط' ? ' · '+esc(m.food_ar) : ''}`
+      : `${esc(m.dose)} <b>${esc(m.freq)}</b>${m.food ? ', '+esc(m.food) : ''}`;
+    const meta = [
+      m.times.map(timeFmt).join(' · '),
+      `${t('since')} ${fmtDate(m.since)}`,
+      m.until ? `${t('until')} ${fmtDate(m.until)}` : null,
+      m.expiry ? `${t('expiry')} ${fmtDate(m.expiry)}` : null,
+    ].filter(Boolean).join(' — ');
+    const miss = m.missed ? `<div class="miss">${esc(lang==='ar'?m.missed_ar:m.missed)}</div>` : '';
+    return `<div class="med">${photo(m.photo)}
+      <div><div class="gen">${esc(gen)}${brand}</div><div class="sig">${sig}</div><div class="meta">${meta}</div>${miss}</div>
+      <div class="adh ${cls}"><div class="n">${a==null?t('newMed'):a+'%'}</div><div class="l">${t('adh')}</div></div></div>`;
+  }).join('') : `<div class="none" style="border:0">${t('none')}</div>`;
+
+  const stopped = data.stopped.length ? `<section><h2>${t('stopped')}</h2><div class="box">${
+    data.stopped.map(m=>`<div class="row"><div><bdi>${esc(m.generic)}</bdi>${m.brand&&m.brand!==m.generic?` <bdi class="brand">(${esc(m.brand)})</bdi>`:''}</div><div class="brand">${fmtDate(m.date)}</div></div>`).join('')
+  }</div></section>` : '';
+
+  const fridge = data.fridge.length ? `<section><h2>${t('fridge')}</h2><div class="box">${
+    data.fridge.map(m=>`<div class="row"><div style="display:flex;gap:10px;align-items:center">${photo(m.photo)}<div><bdi>${esc(m.generic)}</bdi>${m.brand&&m.brand!==m.generic?` <bdi class="brand">(${esc(m.brand)})</bdi>`:''}</div></div><div class="left">${m.left} ${t('left')}</div></div>`).join('')
+  }</div></section>` : '';
+
+  document.getElementById('app').innerHTML = `
+    <header><div class="bar">
+      <div><div class="who">${esc(data.name)}</div><div class="ids">${ids || '&nbsp;'}</div></div>
+      <div class="tools"><span class="timer" id="timer"></span><button class="lang" onclick="toggle()">${t('lang')}</button></div>
+    </div></header>
+    <section>${al}</section>
+    ${flags}
+    <section><h2>${t('active')} · ${data.active.length}</h2><div class="box">${meds}</div></section>
+    ${stopped}
+    ${fridge}
+    <div class="foot">${t('foot')}<br>Dawa Tech · دواء تك</div>`;
+  tick();
+}
+function toggle(){ lang = lang==='en'?'ar':'en'; try{localStorage.setItem('dt_doc_lang',lang)}catch(e){} render(); }
+function tick(){
+  if(!data) return;
+  const s = Math.max(0, Math.floor((new Date(data.expires_at) - Date.now())/1000));
+  if (s===0){ showState(t('expired'), t('expiredSub')); data=null; return; }
+  const el = document.getElementById('timer'); if (el) el.textContent = `${t('valid')} ${Math.ceil(s/60)} ${t('min')}`;
+}
+function showState(big, sub){
+  document.documentElement.dir = lang==='ar'?'rtl':'ltr';
+  document.getElementById('app').innerHTML = `<div class="state"><div class="big">${esc(big)}</div><div style="color:var(--mute)">${esc(sub||'')}</div></div>`;
+}
+setInterval(tick, 15000);
+
+(async ()=>{
+  if (!/^[a-z0-9]{8,32}$/i.test(code)) return showState(t('bad'));
+  const { data: d, error } = await SB.rpc('doctor_card', { p_code: code });
+  if (error) return showState(t('bad'), error.message);
+  if (!d) return showState(t('expired'), t('expiredSub'));
+  data = d; render();
+})();
+</script>
+</body>
+</html>
