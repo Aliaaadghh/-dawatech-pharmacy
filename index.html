@@ -26,6 +26,7 @@ input:focus,textarea:focus{border-color:var(--p)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
 .chip.on{background:var(--p);border-color:var(--p);color:#fff;font-weight:700}
+.chip svg{color:#2F8FD8}.chip.on svg{color:#fff}
 .times{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .times input{width:auto;padding:8px 10px;font-size:16px}
 .btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font:inherit;font-weight:800;font-size:18px;background:var(--p);color:#fff;cursor:pointer}
@@ -89,6 +90,9 @@ input:focus,textarea:focus{border-color:var(--p)}
       <label>مع الأكل</label>
       <div class="chips" id="foodChips"></div>
 
+      <label>الماء مع الحبة</label>
+      <div class="chips" id="waterChips"></div>
+
       <label>مدة العلاج</label>
       <div class="chips" id="dayChips"></div>
 
@@ -139,13 +143,29 @@ function chips(el, items, onPick, initial){
 }
 let state;
 function resetForm(){
-  state={dose:'حبة واحدة',times:['09:00'],food:'بعد الأكل',days:null};
+  state={dose:'حبة واحدة',times:['09:00'],food:'بعد الأكل',days:null,water:null};
   $('brand').value='';$('dose').value='';$('note').value='';$('formErr').textContent='';
   chips($('doseChips'),[['حبة واحدة','حبة واحدة'],['حبتان','حبتان'],['نصف حبة','نصف حبة'],['5 مل','5 مل'],['2.5 مل','2.5 مل']],v=>{state.dose=v;$('dose').value=''},state.dose);
   chips($('freqChips'),[['مرة','1'],['مرتين','2'],['3 مرات','3'],['4 مرات','4']],v=>setTimes({1:['09:00'],2:['09:00','21:00'],3:['08:00','14:00','22:00'],4:['06:00','12:00','18:00','00:00'].sort()}[v]),'1');
   chips($('foodChips'),[['بعد الأكل','بعد الأكل'],['قبل الأكل','قبل الأكل'],['على الريق','على الريق'],['غير مرتبط','غير مرتبط']],v=>state.food=v,state.food);
   chips($('dayChips'),[['مستمر',null],['3 أيام',3],['5 أيام',5],['أسبوع',7],['10 أيام',10],['أسبوعان',14],['شهر',30]],v=>state.days=v,null);
+  waterChips();
   setTimes(['09:00']);
+}
+// Water with the tablet: the patient sees only a glass filled to this level.
+function glassSvg(q){
+  const y=94-88*(q/4>0.95?0.95:q/4);
+  return `<svg width="16" height="20" viewBox="0 0 80 96" style="vertical-align:-4px"><clipPath id="wq${q}"><path d="M8 6h64l-8 82a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6z"/></clipPath><rect x="0" y="${y}" width="80" height="96" fill="currentColor" clip-path="url(#wq${q})"/><path d="M8 6h64l-8 82a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6z" fill="none" stroke="currentColor" stroke-width="8" stroke-linejoin="round"/></svg>`;
+}
+function waterChips(){
+  const el=$('waterChips'); el.innerHTML='';
+  [['بدون',null],['ربع كاسة',1],['نصف كاسة',2],['كاسة',4]].forEach(([label,q])=>{
+    const b=document.createElement('button');b.type='button';b.className='chip';
+    b.innerHTML=(q?glassSvg(q)+' ':'')+label;
+    if(q===state.water) b.classList.add('on');
+    b.onclick=()=>{[...el.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');state.water=q};
+    el.appendChild(b);
+  });
 }
 function setTimes(list){
   state.times=list.slice();
@@ -194,13 +214,13 @@ $('send').onclick=async()=>{
   $('send').disabled=true;$('send').textContent='جارٍ الإرسال…';
   try{
     const {error}=await SB.rpc('pharmacy_submit',{p_code:code,p_brand:brand,p_dose:dose,p_times:times,p_food:state.food,
-      p_days:state.days,p_note:$('note').value.trim(),p_pharmacy:$('pharmacy').value.trim()});
+      p_days:state.days,p_note:$('note').value.trim(),p_pharmacy:$('pharmacy').value.trim(),p_water:state.water});
     if(error) throw error;
     sent++;
     const row=document.createElement('div');row.className='sent';
     row.innerHTML=`<span style="color:var(--ok);font-size:20px">✓</span><div><b class="n"></b><div class="d" style="font-size:13.5px;color:var(--mute)"></div></div>`;
     row.querySelector('.n').textContent=brand;
-    row.querySelector('.d').textContent=[dose,times.join('، '),state.days?state.days+' يوم':'مستمر'].join(' · ');
+    row.querySelector('.d').textContent=[dose,times.join('، '),state.days?state.days+' يوم':'مستمر',{1:'ربع كاسة ماء',2:'نصف كاسة ماء',4:'كاسة ماء'}[state.water]].filter(Boolean).join(' · ');
     const list=$('sentList'); if(sent===1) list.innerHTML=''; list.prepend(row);
     const t=$('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);
     resetForm();renderStatus();window.scrollTo({top:0,behavior:'smooth'});$('brand').focus();
