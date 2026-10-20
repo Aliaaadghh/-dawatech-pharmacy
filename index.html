@@ -103,7 +103,7 @@ input:focus,textarea:focus{border-color:var(--p)}
 
     <div class="card" id="sentCard">
       <h2>أُرسل</h2>
-      <div id="sentList"><div class="note">لم يُرسل شيء بعد.</div></div>
+      <div id="sentList"><div class="note" id="noneSent">لم يُرسل شيء بعد.</div></div>
     </div>
 
     <div class="card">
@@ -221,7 +221,7 @@ $('send').onclick=async()=>{
     row.innerHTML=`<span style="color:var(--ok);font-size:20px">✓</span><div><b class="n"></b><div class="d" style="font-size:13.5px;color:var(--mute)"></div></div>`;
     row.querySelector('.n').textContent=brand;
     row.querySelector('.d').textContent=[dose,times.join('، '),state.days?state.days+' يوم':'مستمر',{1:'ربع كاسة ماء',2:'نصف كاسة ماء',4:'كاسة ماء'}[state.water]].filter(Boolean).join(' · ');
-    const list=$('sentList'); if(sent===1) list.innerHTML=''; list.prepend(row);
+    const list=$('sentList'); $('noneSent')?.remove(); list.prepend(row);
     const t=$('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);
     resetForm();renderStatus();window.scrollTo({top:0,behavior:'smooth'});$('brand').focus();
   }catch(e){$('formErr').textContent=(e.message||'تعذّر الإرسال').replace(/^.*?:\s*/,'')}
