@@ -4,34 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>دواء تك · للصيدلي</title>
-<meta name="theme-color" content="#0B7A75">
+<meta name="theme-color" content="#123C3A">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--p:#0B7A75;--p2:#27A89A;--ink:#16302E;--mute:#5E7774;--line:#D7E8E5;--bg:#F4F8F7;--card:#fff;--warn:#E8A33D;--bad:#C2414B;--ok:#1A9E5C}
+:root{--p:#123C3A;--p2:#1F5550;--mint:#D9F0E9;--ink:#1E2B29;--mute:#66736F;--line:#E2E6E1;--bg:#F7F6F0;--card:#fff;--warn:#9A5B00;--bad:#B4232F;--badbg:#FBE9EA;--ok:#1E7A4C}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,system-ui,sans-serif;font-size:17px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;font-size:17px}
 .top{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:18px 16px 26px;border-radius:0 0 24px 24px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px}
 .top p{margin:6px 0 0;opacity:.85;font-size:14.5px}
 .wrap{max-width:560px;margin:-14px auto 0;padding:0 16px 120px}
 .card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-h2{font-size:17px;margin:0 0 10px;font-weight:800}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
 label{display:block;font-size:14px;color:var(--mute);margin:12px 0 6px;font-weight:500}
 input,textarea{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff;color:var(--ink);outline:none}
 input:focus,textarea:focus{border-color:var(--p)}
 .ltr{direction:ltr;text-align:left}
-.code{font-size:30px;letter-spacing:6px;text-align:center;font-weight:800;text-transform:uppercase}
+.code{font-size:30px;letter-spacing:6px;text-align:center;font-weight:700;text-transform:uppercase}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
 .chip.on{background:var(--p);border-color:var(--p);color:#fff;font-weight:700}
 .chip svg{color:#2F8FD8}.chip.on svg{color:#fff}
+.chip.no.on{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
 .times{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .times input{width:auto;padding:8px 10px;font-size:16px}
-.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font:inherit;font-weight:800;font-size:18px;background:var(--p);color:#fff;cursor:pointer}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font:inherit;font-weight:700;font-size:18px;background:var(--p);color:#fff;cursor:pointer}
 .btn:disabled{opacity:.5}
-.btn.ghost{background:#EAF6F4;color:var(--p);font-size:16px;padding:12px}
+.btn.ghost{background:var(--mint);color:var(--p);font-size:16px;padding:12px}
 .status{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pill{border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700;background:#E3F5EC;color:var(--ok)}
 .pill.bad{background:#FBE7E9;color:var(--bad)}
@@ -40,7 +41,7 @@ input:focus,textarea:focus{border-color:var(--p)}
 .sent:first-of-type{border-top:0}
 .sent b{direction:ltr}
 .err{color:var(--bad);font-size:14.5px;margin-top:10px;min-height:1em}
-.bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(244,248,247,.92);backdrop-filter:blur(8px)}
+.bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(247,246,240,.92);backdrop-filter:blur(8px)}
 .bar .btn{max-width:528px;margin:0 auto}
 .hide{display:none!important}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 18px;border-radius:99px;font-weight:700;opacity:0;transition:opacity .25s;z-index:9}
@@ -50,7 +51,7 @@ input:focus,textarea:focus{border-color:var(--p)}
 <body>
 <div class="top">
   <div class="brand">
-    <svg width="30" height="30" viewBox="0 0 200 200"><defs><mask id="m"><rect width="200" height="200" fill="#fff"/><circle cx="128" cy="82" r="72" fill="#000"/></mask></defs><circle cx="100" cy="100" r="88" fill="#fff" mask="url(#m)"/><circle cx="150" cy="58" r="14" fill="#FFE2A8"/></svg>
+    <svg width="30" height="30" viewBox="0 0 200 200"><defs><mask id="m"><rect width="200" height="200" fill="#fff"/><circle cx="128" cy="82" r="72" fill="#000"/></mask></defs><circle cx="100" cy="100" r="88" fill="#fff" mask="url(#m)"/><circle cx="150" cy="58" r="14" fill="#E9C46A"/></svg>
     دواء تك · للصيدلي
   </div>
   <p>أضف أدوية الوصفة، فتصل لجوال المرافق ليعتمدها بصوته.</p>
@@ -68,7 +69,7 @@ input:focus,textarea:focus{border-color:var(--p)}
   <!-- 2: form -->
   <div id="formArea" class="hide">
     <div class="card status">
-      <div><div style="font-weight:800">الرمز <span class="ltr" id="codeShow"></span></div>
+      <div><div style="font-weight:700">الرمز <span class="ltr" id="codeShow"></span></div>
       <div style="font-size:13.5px;color:var(--mute)" id="sentCount"></div></div>
       <span class="pill" id="timer"></span>
     </div>
@@ -92,6 +93,10 @@ input:focus,textarea:focus{border-color:var(--p)}
 
       <label>الماء مع الحبة</label>
       <div class="chips" id="waterChips"></div>
+
+      <label>ممنوع مع هذا الدواء (اختياري)</label>
+      <div class="chips" id="avoidChips"></div>
+      <input id="avoidNote" class="hide" style="margin-top:8px" maxlength="140" placeholder="ملاحظة تظهر للمرافق: اتركه ساعتين قبل الحليب أو بعده">
 
       <label>مدة العلاج</label>
       <div class="chips" id="dayChips"></div>
@@ -143,13 +148,14 @@ function chips(el, items, onPick, initial){
 }
 let state;
 function resetForm(){
-  state={dose:'حبة واحدة',times:['09:00'],food:'بعد الأكل',days:null,water:null};
+  state={dose:'حبة واحدة',times:['09:00'],food:'بعد الأكل',days:null,water:null,avoid:[]};
   $('brand').value='';$('dose').value='';$('note').value='';$('formErr').textContent='';
   chips($('doseChips'),[['حبة واحدة','حبة واحدة'],['حبتان','حبتان'],['نصف حبة','نصف حبة'],['5 مل','5 مل'],['2.5 مل','2.5 مل']],v=>{state.dose=v;$('dose').value=''},state.dose);
   chips($('freqChips'),[['مرة','1'],['مرتين','2'],['3 مرات','3'],['4 مرات','4']],v=>setTimes({1:['09:00'],2:['09:00','21:00'],3:['08:00','14:00','22:00'],4:['06:00','12:00','18:00','00:00'].sort()}[v]),'1');
   chips($('foodChips'),[['بعد الأكل','بعد الأكل'],['قبل الأكل','قبل الأكل'],['على الريق','على الريق'],['غير مرتبط','غير مرتبط']],v=>state.food=v,state.food);
   chips($('dayChips'),[['مستمر',null],['3 أيام',3],['5 أيام',5],['أسبوع',7],['10 أيام',10],['أسبوعان',14],['شهر',30]],v=>state.days=v,null);
   waterChips();
+  avoidChips();
   setTimes(['09:00']);
 }
 // Water with the tablet: the patient sees only a glass filled to this level.
@@ -164,6 +170,20 @@ function waterChips(){
     b.innerHTML=(q?glassSvg(q)+' ':'')+label;
     if(q===state.water) b.classList.add('on');
     b.onclick=()=>{[...el.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');state.water=q};
+    el.appendChild(b);
+  });
+}
+// Foods to keep away: the patient sees a crossed picture, the caregiver and doctor see «حسب الصيدلي».
+const AVOID=[['milk','الحليب ومشتقاته'],['grapefruit','الجريب فروت'],['caffeine','القهوة والشاي'],['potassium','الموز والبرتقال'],['greens','الخضار الورقية'],['other','أخرى']];
+function avoidChips(){
+  const el=$('avoidChips'); el.innerHTML=''; $('avoidNote').value=''; $('avoidNote').classList.add('hide');
+  AVOID.forEach(([k,label])=>{
+    const b=document.createElement('button');b.type='button';b.className='chip no';b.textContent=(k==='other'?'':'⊘ ')+label;
+    b.onclick=()=>{
+      b.classList.toggle('on');
+      if(k==='other'){$('avoidNote').classList.toggle('hide',!b.classList.contains('on'));if(b.classList.contains('on'))$('avoidNote').focus();return}
+      state.avoid=b.classList.contains('on')?[...state.avoid,k]:state.avoid.filter(x=>x!==k);
+    };
     el.appendChild(b);
   });
 }
@@ -213,14 +233,18 @@ $('send').onclick=async()=>{
   const times=[...new Set(state.times.filter(Boolean))].sort();
   $('send').disabled=true;$('send').textContent='جارٍ الإرسال…';
   try{
-    const {error}=await SB.rpc('pharmacy_submit',{p_code:code,p_brand:brand,p_dose:dose,p_times:times,p_food:state.food,
-      p_days:state.days,p_note:$('note').value.trim(),p_pharmacy:$('pharmacy').value.trim(),p_water:state.water});
+    const args={p_code:code,p_brand:brand,p_dose:dose,p_times:times,p_food:state.food,
+      p_days:state.days,p_note:$('note').value.trim(),p_pharmacy:$('pharmacy').value.trim(),p_water:state.water};
+    // Sent only when set, so the page keeps working before v14.sql runs.
+    const avoidNote=$('avoidNote').classList.contains('hide')?'':$('avoidNote').value.trim();
+    if(state.avoid.length||avoidNote){args.p_avoid=state.avoid;args.p_avoid_note=avoidNote}
+    const {error}=await SB.rpc('pharmacy_submit',args);
     if(error) throw error;
     sent++;
     const row=document.createElement('div');row.className='sent';
     row.innerHTML=`<span style="color:var(--ok);font-size:20px">✓</span><div><b class="n"></b><div class="d" style="font-size:13.5px;color:var(--mute)"></div></div>`;
     row.querySelector('.n').textContent=brand;
-    row.querySelector('.d').textContent=[dose,times.join('، '),state.days?state.days+' يوم':'مستمر',{1:'ربع كاسة ماء',2:'نصف كاسة ماء',4:'كاسة ماء'}[state.water]].filter(Boolean).join(' · ');
+    row.querySelector('.d').textContent=[dose,times.join('، '),state.days?state.days+' يوم':'مستمر',{1:'ربع كاسة ماء',2:'نصف كاسة ماء',4:'كاسة ماء'}[state.water],state.avoid.length?'بدون '+state.avoid.map(k=>AVOID.find(a=>a[0]===k)[1]).join('، '):null].filter(Boolean).join(' · ');
     const list=$('sentList'); $('noneSent')?.remove(); list.prepend(row);
     const t=$('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);
     resetForm();renderStatus();window.scrollTo({top:0,behavior:'smooth'});$('brand').focus();

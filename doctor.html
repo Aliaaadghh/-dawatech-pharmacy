@@ -48,6 +48,7 @@ h2{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu
 .adh .n{font-weight:700;font-size:16px}
 .adh .l{font-size:11.5px;color:var(--mute)}
 .adh.good .n{color:var(--ok)} .adh.mid .n{color:var(--warn)} .adh.low .n{color:var(--bad)}
+.avoid{display:block;width:fit-content;margin-top:5px;background:#FBE9EA;color:#B4232F;border-radius:6px;padding:2px 8px;font-size:12.5px;font-weight:600}
 .miss{display:inline-block;margin-top:5px;background:var(--warnbg);color:var(--warn);border-radius:6px;padding:2px 8px;font-size:12.5px;font-weight:600}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
 .row:first-child{border-top:0}
@@ -77,12 +78,16 @@ const T = {
       stopped:'Stopped · last 3 months',fridge:'Leftover at home',left:'left',adh:'adherence 30d',newMed:'new',since:'since',until:'until',
       expired:'This link has expired',expiredSub:'Ask the caregiver to open the doctor card again for a new code.',
       bad:'Invalid link',valid:'valid',min:'min',foot:'Entered by the caregiver in Dawa Tech — not an official medical record. Adherence is based on dose confirmations on the patient\'s phone.',
-      child:'child',expiry:'box exp.',lang:'عربي',title:'Medication card'},
+      child:'child',expiry:'box exp.',lang:'عربي',title:'Medication card',
+      diet:'Diet',avoid:'Avoid',pharmacist:'per pharmacist',caregiver:'per caregiver',
+      symptoms:'Noticed by the caregiver · 30 days',symNote:'Recorded as the caregiver said, not interpreted.'},
   ar:{allergies:'الحساسية',noAllergy:'لا توجد حساسية مسجلة',flags:'تنبيهات',active:'الأدوية الحالية',none:'لا أدوية حالية',
       stopped:'أُوقفت · آخر 3 أشهر',fridge:'متبقٍّ في البيت (ثلاجة الدواء)',left:'متبقٍّ',adh:'الالتزام 30 يومًا',newMed:'جديد',since:'منذ',until:'حتى',
       expired:'انتهت صلاحية الرابط',expiredSub:'اطلب من المرافق فتح بطاقة الطبيب مرة أخرى لرمز جديد.',
       bad:'رابط غير صحيح',valid:'صالحة',min:'د',foot:'بيانات أدخلها المرافق في دواء تك، وليست سجلًا طبيًا رسميًا. الالتزام محسوب من تأكيدات جوال المريض.',
-      child:'طفل',expiry:'صلاحية العلبة',lang:'English',title:'بطاقة الأدوية'}
+      child:'طفل',expiry:'صلاحية العلبة',lang:'English',title:'بطاقة الأدوية',
+      diet:'الحمية',avoid:'بدون',pharmacist:'حسب الصيدلي',caregiver:'حسب المرافق',
+      symptoms:'أعراض لاحظها المرافق · آخر 30 يومًا',symNote:'مسجّلة كما قالها المرافق، دون تفسير.'}
 };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const t = k => T[lang][k];
@@ -135,10 +140,18 @@ function render(){
       m.expiry ? `${t('expiry')} ${fmtDate(m.expiry)}` : null,
     ].filter(Boolean).join(' — ');
     const miss = m.missed ? `<div class="miss">${esc(lang==='ar'?m.missed_ar:m.missed)}</div>` : '';
+    const avoid = (m.avoid||[]).map(a=>`<div class="avoid">⊘ ${t('avoid')} ${esc(lang==='ar'?a.ar:a.en)} · ${t(a.by)}</div>`).join('')
+      + (m.avoid_note ? `<div class="meta">«${esc(m.avoid_note)}»</div>` : '');
     return `<div class="med">${photo(m.photo)}
-      <div><div class="gen">${esc(gen)}${brand}</div><div class="sig">${sig}</div><div class="meta">${meta}</div>${miss}</div>
+      <div><div class="gen">${esc(gen)}${brand}</div><div class="sig">${sig}</div><div class="meta">${meta}</div>${miss}${avoid}</div>
       <div class="adh ${cls}"><div class="n">${a==null?t('newMed'):a+'%'}</div><div class="l">${t('adh')}</div></div></div>`;
   }).join('') : `<div class="none" style="border:0">${t('none')}</div>`;
+
+  const diet = (data.diet||[]).length
+    ? `<div class="none" style="margin-top:8px"><b>${t('diet')}:</b> ${data.diet.map(d=>esc(lang==='ar'?d.ar:d.en)).join(' · ')}</div>` : '';
+  const sym = (data.symptoms||[]).length ? `<section><h2>${t('symptoms')}</h2><div class="box">${
+    data.symptoms.map(x=>`<div class="row"><div>${esc(lang==='ar'?x.ar:x.en)}${x.note?` <span class="brand">— ${esc(x.note)}</span>`:''}</div><div class="brand">${fmtDate(x.date)}</div></div>`).join('')
+  }</div><div class="meta" style="padding:6px 4px">${t('symNote')}</div></section>` : '';
 
   const stopped = data.stopped.length ? `<section><h2>${t('stopped')}</h2><div class="box">${
     data.stopped.map(m=>`<div class="row"><div><bdi>${esc(m.generic)}</bdi>${m.brand&&m.brand!==m.generic?` <bdi class="brand">(${esc(m.brand)})</bdi>`:''}</div><div class="brand">${fmtDate(m.date)}</div></div>`).join('')
@@ -153,9 +166,10 @@ function render(){
       <div><div class="who">${esc(data.name)}</div><div class="ids">${ids || '&nbsp;'}</div></div>
       <div class="tools"><span class="timer" id="timer"></span><button class="lang" onclick="toggle()">${t('lang')}</button></div>
     </div></header>
-    <section>${al}</section>
+    <section>${al}${diet}</section>
     ${flags}
     <section><h2>${t('active')} · ${data.active.length}</h2><div class="box">${meds}</div></section>
+    ${sym}
     ${stopped}
     ${fridge}
     <div class="foot">${t('foot')}<br>Dawa Tech · دواء تك</div>`;
